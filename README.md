@@ -50,13 +50,7 @@ ECLAT là thuật toán dùng để khai phá **frequent itemsets** trong dữ l
 │   └── figures/
 │       ├── top_frequent_itemsets.png
 │       └── top_association_rules.png
-│
-├── report/
-│   ├── Bao_cao_ECLAT.docx
-│   └── Bao_cao_ECLAT.pdf
-│
-└── slides/
-    └── Slide_ECLAT.pptx
+
 ```
 
 ## 4. Mô tả các thư mục chính
@@ -105,25 +99,12 @@ Chứa kết quả sau khi chạy demo.
 - `association_rules.csv`: danh sách luật kết hợp được sinh ra.
 - `figures/`: các biểu đồ hoặc hình minh họa kết quả thực nghiệm.
 
-### `report/`
-
-Chứa báo cáo cuối cùng của đồ án ở định dạng `.docx` và `.pdf`.
-
-### `slides/`
-
-Chứa slide thuyết trình của nhóm.
 
 ## 5. Cài đặt môi trường
 
 Yêu cầu cài đặt Python 3.9 trở lên.
 
 Cài đặt các thư viện cần thiết:
-
-```bash
-pip install -r requirements.txt
-```
-
-Nếu chưa có file `requirements.txt`, có thể tạo file với các thư viện cơ bản sau:
 
 ```text
 pandas
