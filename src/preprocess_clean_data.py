@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 def preprocess_data():
-    # Đảm bảo đường dẫn chạy đúng từ thư mục gốc của project
+    # Ensure the working directory is the project root
     current_dir = os.getcwd()
     if os.path.basename(current_dir) == 'src':
         os.chdir('..')
@@ -10,46 +10,59 @@ def preprocess_data():
     raw_data_path = 'data/raw/Online Retail.xlsx'
     processed_transactions_path = 'data/processed/transactions_cleaned.csv'
     baskets_path = 'data/processed/baskets.csv'
+    mapping_path = 'data/processed/stockcode_description_map.csv'
 
-    print(f"Đang đọc dữ liệu từ: {raw_data_path} ...")
+    print(f"Reading data from: {raw_data_path} ...")
     df = pd.read_excel(raw_data_path)
 
-    print("Bắt đầu làm sạch dữ liệu...")
-    # Xoá khoảng trắng trùng lặp ở Description
-    df['Description'] = df['Description'].str.strip()
+    print("Starting data cleaning...")
+    
+    # Drop rows with missing Description
+    df.dropna(axis=0, subset=['Description'], inplace=True)
+    
+    # Convert Description to string and remove leading/trailing whitespaces
+    df['Description'] = df['Description'].astype(str).str.strip()
 
-    # Loại bỏ các hàng bị thiếu InvoiceNo
+    # Drop rows with missing InvoiceNo
     df.dropna(axis=0, subset=['InvoiceNo'], inplace=True)
     df['InvoiceNo'] = df['InvoiceNo'].astype('str')
 
-    # Loại bỏ các giao dịch bị hủy (InvoiceNo chứa 'C')
+    # Remove cancelled transactions (InvoiceNo contains 'C')
     df = df[~df['InvoiceNo'].str.contains('C')]
 
-    # Loại bỏ các giao dịch có Quantity <= 0
+    # Keep only transactions with Quantity > 0
     df = df[df['Quantity'] > 0]
 
-    # Loại bỏ các hàng thiếu Description
-    df.dropna(axis=0, subset=['Description'], inplace=True)
+    # Convert StockCode to string and keep only valid product codes using regex
+    # Valid codes: 5 digits optionally followed by 1 letter (e.g., '85123', '85123A')
+    df['StockCode'] = df['StockCode'].astype('str')
+    df = df[df['StockCode'].str.match(r'^\d{5}[a-zA-Z]?$')]
 
-    print(f"Số lượng bản ghi giao dịch sau khi làm sạch: {df.shape[0]}")
+    print(f"Number of transaction records after cleaning: {df.shape[0]}")
 
-    # Đảm bảo thư mục lưu trữ đã tồn tại
+    # Ensure processed directory exists
     os.makedirs('data/processed', exist_ok=True)
 
-    print("Đang lưu dữ liệu giao dịch đã làm sạch...")
+    print("Saving cleaned transaction data...")
     df.to_csv(processed_transactions_path, index=False)
-    print(f"Đã lưu thành công tại: {processed_transactions_path}")
+    print(f"Successfully saved to: {processed_transactions_path}")
 
-    print("Chuyển đổi định dạng giỏ hàng (Baskets)...")
-    # Nhóm theo giao dịch để tạo giỏ hàng cho từng hóa đơn
-    baskets = df.groupby('InvoiceNo')['Description'].apply(list).reset_index()
+    # Create StockCode -> Description mapping table
+    print("Creating StockCode -> Description mapping table...")
+    mapping = df.groupby('StockCode')['Description'].first().reset_index()
+    mapping.to_csv(mapping_path, index=False)
+    print(f"Mapping table saved to: {mapping_path}")
 
-    # Chuyển list thành chuỗi các mặt hàng cách nhau bởi dấu phẩy
-    baskets['Items'] = baskets['Description'].apply(lambda x: ','.join(x))
-    baskets.drop('Description', axis=1, inplace=True)
+    print("Converting to basket format...")
+    # Group by transaction, get unique list of product names for each invoice
+    baskets = df.groupby('InvoiceNo')['Description'].apply(
+        lambda x: ','.join(sorted(set(x)))
+    ).reset_index()
+    baskets.columns = ['InvoiceNo', 'Items']
 
     baskets.to_csv(baskets_path, index=False)
-    print(f"Đã lưu file giỏ hàng thành công tại: {baskets_path}")
+    print(f"Successfully saved basket file to: {baskets_path}")
+    print(f"Total number of baskets: {baskets.shape[0]}")
 
 if __name__ == "__main__":
     preprocess_data()
