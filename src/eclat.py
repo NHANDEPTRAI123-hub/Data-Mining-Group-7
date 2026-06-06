@@ -10,7 +10,7 @@ from typing import Iterable
 from utils import ensure_project_root, format_itemset, load_transactions
 
 
-DEFAULT_TRANSACTIONS_PATH = Path("data/processed/transactions_cleaned.csv")
+DEFAULT_BASKETS_PATH = Path("data/processed/baskets.csv")
 DEFAULT_OUTPUT_PATH = Path("results/frequent_itemsets.csv")
 
 
@@ -152,8 +152,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--input",
-        default=str(DEFAULT_TRANSACTIONS_PATH),
-        help="Path to transactions_cleaned.csv or baskets.csv",
+        default=str(DEFAULT_BASKETS_PATH),
+        help="Path to baskets.csv or transactions_cleaned.csv",
     )
     parser.add_argument(
         "--output",

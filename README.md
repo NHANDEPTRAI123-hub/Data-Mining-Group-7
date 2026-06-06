@@ -73,7 +73,7 @@ Chứa dữ liệu đã được làm sạch và chuyển đổi để phục v�
 Ví dụ:
 
 - `transactions_cleaned.csv`: dữ liệu sau khi loại bỏ bản ghi lỗi, dữ liệu thiếu hoặc giao dịch không hợp lệ.
-- `baskets.csv`: dữ liệu dạng basket, trong đó mỗi dòng tương ứng với một giao dịch và danh sách item trong giao dịch đó.
+- `baskets.csv`: dữ liệu dạng basket, trong đó mỗi dòng tương ứng với một giao dịch và cột `Items` là JSON list các sản phẩm trong giao dịch đó.
 
 ### `notebooks/`
 
@@ -142,7 +142,7 @@ Kết quả frequent itemsets sẽ được lưu tại:
 results/frequent_itemsets.csv
 ```
 
-Mặc định script đọc từ `data/processed/transactions_cleaned.csv` để giữ nguyên tên sản phẩm gốc, kể cả các sản phẩm có dấu phẩy trong mô tả. Nếu muốn đọc file basket đã tạo sẵn, có thể truyền:
+Mặc định script đọc từ `data/processed/baskets.csv`, đúng với dữ liệu basket được tạo sau bước tiền xử lý. Cột `Items` được lưu dưới dạng JSON list để giữ nguyên tên sản phẩm gốc, kể cả sản phẩm có dấu phẩy trong mô tả.
 
 ```bash
 python src/eclat.py --input data/processed/baskets.csv

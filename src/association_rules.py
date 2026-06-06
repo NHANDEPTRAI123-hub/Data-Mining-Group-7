@@ -6,8 +6,8 @@ from itertools import combinations
 from pathlib import Path
 
 from eclat import (
+    DEFAULT_BASKETS_PATH,
     DEFAULT_OUTPUT_PATH,
-    DEFAULT_TRANSACTIONS_PATH,
     resolve_min_support_count,
 )
 from utils import ensure_project_root, format_itemset, load_transactions, parse_itemset
@@ -276,11 +276,11 @@ def parse_args() -> argparse.Namespace:
         description="Generate association rules from ECLAT frequent itemsets."
     )
     parser.add_argument(
-        "--transactions",
         "--baskets",
-        dest="transactions",
-        default=str(DEFAULT_TRANSACTIONS_PATH),
-        help="Path to transactions_cleaned.csv or baskets.csv",
+        "--transactions",
+        dest="baskets",
+        default=str(DEFAULT_BASKETS_PATH),
+        help="Path to baskets.csv or transactions_cleaned.csv",
     )
     parser.add_argument(
         "--frequent-itemsets",
@@ -328,7 +328,7 @@ def main() -> None:
     ensure_project_root()
     args = parse_args()
 
-    baskets = load_transactions(args.transactions)
+    baskets = load_transactions(args.baskets)
     frequent_itemsets_path = Path(args.frequent_itemsets)
 
     if frequent_itemsets_path.exists():

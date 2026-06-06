@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import os
 from collections import defaultdict
 from pathlib import Path
@@ -32,11 +33,32 @@ def load_baskets(path: str | Path) -> list[tuple[str, tuple[str, ...]]]:
 
         for row in reader:
             invoice_no = str(row["InvoiceNo"]).strip()
-            raw_items = row["Items"] or ""
-            separator = BASKET_ITEM_SEPARATOR if BASKET_ITEM_SEPARATOR in raw_items else ","
-            items = tuple(
-                sorted({item.strip() for item in raw_items.split(separator) if item.strip()})
-            )
+            raw_items = (row["Items"] or "").strip()
+            if not raw_items:
+                continue
+
+            if raw_items.startswith("["):
+                parsed_items = json.loads(raw_items)
+                items = tuple(sorted({str(item).strip() for item in parsed_items if str(item).strip()}))
+            elif BASKET_ITEM_SEPARATOR in raw_items:
+                items = tuple(
+                    sorted(
+                        {
+                            item.strip()
+                            for item in raw_items.split(BASKET_ITEM_SEPARATOR)
+                            if item.strip()
+                        }
+                    )
+                )
+            elif "," in raw_items:
+                raise ValueError(
+                    f"{baskets_path} appears to use comma-separated baskets. "
+                    "This is unsafe because product descriptions can contain commas. "
+                    "Run src/preprocess_clean_data.py again to regenerate baskets.csv."
+                )
+            else:
+                items = (raw_items,)
+
             if invoice_no and items:
                 baskets.append((invoice_no, items))
 

@@ -1,7 +1,6 @@
 import pandas as pd
 import os
-
-ITEM_SEPARATOR = " ||| "
+import json
 
 def preprocess_data():
     # Ensure the working directory is the project root
@@ -58,7 +57,7 @@ def preprocess_data():
     print("Converting to basket format...")
     # Group by transaction, get unique list of product names for each invoice
     baskets = df.groupby('InvoiceNo')['Description'].apply(
-        lambda x: ITEM_SEPARATOR.join(sorted(set(x)))
+        lambda x: json.dumps(sorted(set(x)), ensure_ascii=False)
     ).reset_index()
     baskets.columns = ['InvoiceNo', 'Items']
 
