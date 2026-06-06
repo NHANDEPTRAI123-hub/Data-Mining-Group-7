@@ -2,7 +2,7 @@
 
 ## 1. Giới thiệu
 
-Repository này chứa toàn bộ source code, notebook, dữ liệu và tài liệu phục vụ đồ án môn **Khai phá dữ liệu** với chủ đề **thuật toán ECLAT**.
+Repository này chứa notebook, dữ liệu đã xử lý và kết quả thực nghiệm phục vụ đồ án môn **Khai phá dữ liệu** với chủ đề **thuật toán ECLAT**.
 
 ECLAT là thuật toán dùng để khai phá **frequent itemsets** trong dữ liệu giao dịch bằng cách biểu diễn dữ liệu ở dạng dọc thông qua **TID-list**. Từ các frequent itemsets thu được, đồ án tiếp tục sinh **association rules** và đánh giá các luật bằng các chỉ số như **support**, **confidence** và **lift**.
 
@@ -25,23 +25,16 @@ ECLAT là thuật toán dùng để khai phá **frequent itemsets** trong dữ l
 │
 ├── data/
 │   ├── raw/
-│   │   ├── transactions_raw.csv
-│   │   ├── customer_info.csv
-│   │   └── product_info.csv
+│   │   └── Online Retail.xlsx
 │   │
 │   └── processed/
 │       ├── transactions_cleaned.csv
+│       ├── stockcode_description_map.csv
 │       └── baskets.csv
 │
 ├── notebooks/
 │   ├── 01_data_preprocessing.ipynb
 │   └── 02_chay_thuat_toan_eclat_va_danh_gia.ipynb
-│
-├── src/
-│   ├── preprocess_clean_data.py
-│   ├── eclat.py
-│   ├── association_rules.py
-│   └── utils.py
 │
 ├── results/
 │   ├── frequent_itemsets.csv
@@ -60,11 +53,7 @@ ECLAT là thuật toán dùng để khai phá **frequent itemsets** trong dữ l
 
 Chứa dữ liệu gốc được tải từ nguồn dữ liệu ban đầu. Dữ liệu trong thư mục này không nên chỉnh sửa trực tiếp.
 
-Ví dụ:
-
-- `transactions_raw.csv`: dữ liệu giao dịch gốc.
-- `customer_info.csv`: thông tin khách hàng, nếu bộ dữ liệu có.
-- `product_info.csv`: thông tin sản phẩm, nếu bộ dữ liệu có.
+- `Online Retail.xlsx`: dữ liệu giao dịch gốc dùng trong đồ án.
 
 ### `data/processed/`
 
@@ -73,6 +62,7 @@ Chứa dữ liệu đã được làm sạch và chuyển đổi để phục v�
 Ví dụ:
 
 - `transactions_cleaned.csv`: dữ liệu sau khi loại bỏ bản ghi lỗi, dữ liệu thiếu hoặc giao dịch không hợp lệ.
+- `stockcode_description_map.csv`: bảng ánh xạ mã sản phẩm sang tên sản phẩm.
 - `baskets.csv`: dữ liệu dạng basket, trong đó mỗi dòng tương ứng với một giao dịch và cột `Items` là JSON list các sản phẩm trong giao dịch đó.
 
 ### `notebooks/`
@@ -81,15 +71,6 @@ Chứa các notebook dùng để trình bày quá trình xử lý và chạy dem
 
 - `01_data_preprocessing.ipynb`: đọc dữ liệu, làm sạch dữ liệu và tạo dữ liệu dạng basket.
 - `02_chay_thuat_toan_eclat_va_danh_gia.ipynb`: chạy thuật toán ECLAT, sinh association rules, thử nghiệm ngưỡng support và phân tích kết quả.
-
-### `src/`
-
-Chứa source code chính của đồ án.
-
-- `preprocess_clean_data.py`: xử lý dữ liệu thô và tạo dữ liệu đã làm sạch.
-- `eclat.py`: triển khai thuật toán ECLAT.
-- `association_rules.py`: sinh luật kết hợp từ frequent itemsets.
-- `utils.py`: các hàm hỗ trợ dùng chung.
 
 ### `results/`
 
@@ -111,6 +92,7 @@ Cài đặt các thư viện cần thiết:
 pandas
 numpy
 matplotlib
+openpyxl
 jupyter
 ```
 
@@ -118,62 +100,18 @@ Tùy cách triển khai, nhóm có thể bổ sung thêm thư viện khác.
 
 ## 6. Cách chạy demo
 
-### Bước 1: Tiền xử lý dữ liệu
-
-```bash
-python src/preprocess_clean_data.py
-```
-
-Sau bước này, dữ liệu đã xử lý sẽ được lưu trong thư mục:
-
-```text
-data/processed/
-```
-
-### Bước 2: Chạy thuật toán ECLAT
-
-```bash
-python src/eclat.py
-```
-
-Kết quả frequent itemsets sẽ được lưu tại:
-
-```text
-results/frequent_itemsets.csv
-```
-
-Mặc định script đọc từ `data/processed/baskets.csv`, đúng với dữ liệu basket được tạo sau bước tiền xử lý. Cột `Items` được lưu dưới dạng JSON list để giữ nguyên tên sản phẩm gốc, kể cả sản phẩm có dấu phẩy trong mô tả.
-
-```bash
-python src/eclat.py --input data/processed/baskets.csv
-```
-
-### Bước 3: Sinh luật kết hợp
-
-```bash
-python src/association_rules.py
-```
-
-Kết quả association rules sẽ được lưu tại:
-
-```text
-results/association_rules.csv
-```
-
-Script cũng tạo thêm file kết luận ngắn:
-
-```text
-results/eclat_summary.md
-```
-
-### Bước 4: Chạy bằng notebook
-
-Có thể chạy lần lượt các notebook trong thư mục `notebooks/`:
+Đồ án chạy trực tiếp bằng notebook. Có thể mở Jupyter Notebook hoặc JupyterLab rồi chạy lần lượt:
 
 ```text
 01_data_preprocessing.ipynb
 02_chay_thuat_toan_eclat_va_danh_gia.ipynb
 ```
+
+Notebook `01_data_preprocessing.ipynb` tạo dữ liệu đã làm sạch và file basket trong `data/processed/`.
+
+Notebook `02_chay_thuat_toan_eclat_va_danh_gia.ipynb` đọc `data/processed/baskets.csv`, chạy ECLAT, sinh luật kết hợp và lưu kết quả vào `results/`.
+
+Cột `Items` trong `baskets.csv` được lưu dưới dạng JSON list để giữ nguyên tên sản phẩm gốc, kể cả sản phẩm có dấu phẩy trong mô tả.
 
 ## 7. Tham số chính
 
@@ -258,7 +196,7 @@ Trước khi nộp, cần kiểm tra đủ các thành phần sau:
 
 - Báo cáo `.docx` và `.pdf`.
 - Slide thuyết trình.
-- Source code hoặc notebook demo.
+- Notebook demo.
 - Dữ liệu gốc hoặc link dữ liệu.
 - Dữ liệu đã xử lý nếu có.
 - Kết quả frequent itemsets và association rules.
